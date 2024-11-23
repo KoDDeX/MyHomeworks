@@ -1,0 +1,20 @@
+h1, h2{
+    text-align: center;
+}
+.language-JS {
+    background-color: lightgrey;
+    border: 2px solid darkslategrey;
+}
+code {
+    font-family: monospace;
+    background-color: lightgrey;
+    border: 2px solid darkslategrey;    
+    border-radius: 5px;
+}
+pre code {
+    border: none;
+}
+header, main, footer {
+    background-color: lightcyan;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
