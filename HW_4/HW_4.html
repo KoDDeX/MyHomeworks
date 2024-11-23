@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="keywords"
+      content="JavaScript, типы данных, типы данных JavaScript"
+    />
+    <meta name="description" content="Типы данных в JavaScript" />
+    <title>Типы данных JavaScript</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="HW_4.CSS" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/tomorrow-night-bright.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ol>
+          <li><a href="#prm_data_type">Примитивные типы данных</a></li>
+          <li><a href="#quotes">Цитаты про программирование</a></li>
+          <li><a href="#obj_data_type">Объектные типы данных</a></li>
+          <li><a href="#table_data_type">Таблица типов данных</a></li>
+          <li><a href="#conclusion">Заключение</a></li>
+        </ol>
+      </nav>
+      <h1>Типы данных JavaScript</h1>
+      <p>
+        <abbr title="JavaScript">JS</abbr> — это язык программирования, который
+        работает с различными типами данных. В этой статье мы рассмотрим
+        основные типы данных, с которыми вам придется столкнуться при работе с
+        JavaScript.
+      </p>
+    </header>
+    <main>
+      <section>
+        <h2 id="prm_data_type">Примитивные типы данных</h2>
+        <p>
+          Примитивные типы данных — это базовые типы данных в JavaScript,
+          которые не являются объектами и не имеют методов. К ним относятся:
+        </p>
+        <ol>
+          <li>
+            <code class="language-javascript hljs">String (строка)</code> — представляет собой последовательность
+            символов.
+          </li>
+          <li>
+            <code class="language-javascript hljs">Number (число)</code> — может быть целым числом или числом с
+            плавающей запятой.
+          </li>
+          <li>
+            <code class="language-javascript hljs">Boolean (логическое значение)</code> — может принимать только
+            два значения: <code class="language-javascript hljs">true</code> или <code class="language-javascript hljs">false</code>.
+          </li>
+          <li>
+            <code class="language-javascript hljs">Undefined (неопределенный тип)</code> — значение переменной,
+            которая была объявлена, но не была инициализирована.
+          </li>
+          <li>
+            <code class="language-javascript hljs">Null (нулевой тип)</code> — особое значение, которое указывает
+            на отсутствие объекта.
+          </li>
+        </ol>
+        <p>Пример использования примитивных типов данных:</p>
+        <pre><code class="language-javascript hljs">
+// javascript
+let name = "John";  // String
+let age = 30;       // Number
+let isStudent = false; // Boolean
+let job;            // Undefined
+let car = null;     // Null
+          </code></pre>
+      </section>
+      <section>
+        <h2 id="quotes">И пару цитат про программирование</h2>
+        <p>
+          <em>"Программирование — это не спринт, а марафон."</em> — Сергей
+          Немчинский.
+        </p>
+        <p>
+          <em
+            >"Не грусти. Рано или поздно все станет понятно, все станет на свои
+            места и выстроится в единую красивую схему, как кружева. Станет
+            понятно, зачем все было нужно, потому что все будет правильно"</em
+          >
+          — Алиса в Стране Чудес.
+        </p>
+      </section>
+      <section>
+        <h2 id="obj_data_type">Объектные типы данных</h2>
+        <p>
+          В JavaScript также существуют типы данных, основанные на объектах. Эти
+          типы позволяют хранить более сложные структуры данных. Рассмотрим
+          основные объектные типы:
+        </p>
+        <ol>
+          <li>
+            <code class="language-javascript hljs">Object (объект)</code> — коллекция пар "ключ-значение".
+            Ключами могут быть строки или символы, а значениями — любые типы
+            данных.
+          </li>
+          <li>
+            <code class="language-javascript hljs">Array (массив)</code> — упорядоченный список значений,
+            индексированный целыми числами.
+          </li>
+          <li>
+            <code class="language-javascript hljs">Function (функция)</code> — блок кода, который можно вызвать
+            для выполнения определенной задачи.
+          </li>
+        </ol>
+        <p>Пример работы с объектными типами данных:</p>
+        <pre><code class="language-javascript hljs">
+// javascript
+let person = {
+name: "John",
+age: 30,
+isStudent: true
+};
+
+let numbers = [1, 2, 3, 4, 5];
+
+function greet() {
+console.log("Hello, World!");
+}
+        </code></pre>
+      </section>
+      <section>
+        <h2 id="table_data_type">Таблица типов данных</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Тип данных</th>
+              <th>Описание</th>
+            </tr>
+          </thead>
+          <tbody>
+            tr>td>ol>li*5
+            <tr>
+              <td><code class="language-javascript hljs">String</code></td>
+              <td>Последовательность символов</td>
+            </tr>
+            <tr>
+              <td><code class="language-javascript hljs">Number</code></td>
+              <td>Число, целое или с плавающей запятой</td>
+            </tr>
+            <tr>
+              <td><code class="language-javascript hljs">Boolean</code></td>
+              <td>
+                Логическое значение: <code class="language-javascript hljs">true</code> или <code class="language-javascript hljs">false</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code class="language-javascript hljs">Undefined</code></td>
+              <td>Значение переменной, которая не была инициализирована</td>
+            </tr>
+            <tr>
+              <td><code class="language-javascript hljs">Null</code></td>
+              <td>Указывает на отсутствие объекта</td>
+            </tr>
+            <tr>
+              <td><code class="language-javascript hljs">Object</code></td>
+              <td>Коллекция пар "ключ-значение"</td>
+            </tr>
+            <tr>
+              <td><code class="language-javascript hljs">Array</code></td>
+              <td>Упорядоченный список значений</td>
+            </tr>
+            <tr>
+              <td><code class="language-javascript hljs">Function</code></td>
+              <td>
+                Блок кода, который можно вызвать для выполнения определенной
+                задачи
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+    <footer>
+      <section>
+        <h2 id="conclusion">Заключение</h2>
+        <p>
+          В JavaScript важно понимать, какие типы данных вы используете, так как
+          это влияет на поведение вашего кода. Примитивные типы данных, такие
+          как строки, числа и логические значения, являются основой языка и
+          часто используются для простых операций. Они не имеют методов и не
+          могут быть изменены после создания. Например, строка "John" или число
+          30 — это примитивные значения, которые могут быть легко использованы в
+          различных вычислениях и логических выражениях.
+        </p>
+        <p>
+          С другой стороны, объектные типы данных предоставляют более сложные
+          структуры для хранения информации. Объекты позволяют организовывать
+          данные в пары "ключ-значение", что упрощает доступ к ним и управление
+          ими. Массивы упорядочивают данные, делая их удобными для перебора и
+          манипуляций. Функции же представляют собой блоки кода, которые можно
+          повторно использовать для выполнения задач. Знание этих типов данных
+          поможет вам более эффективно работать с JavaScript и строить
+          качественные приложения.
+        </p>
+      </section>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+  </body>
+</html>
