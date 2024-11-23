@@ -2,3 +2,4 @@
 \venv
 *.7z
 *.md
+\__pycache__
