@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Программа оценки уровня знаний студента</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        p {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            width: 400px;
+            border: 2px solid black;
+            border-radius: 10px;
+            box-shadow: 2px 3px 3px  gray;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Оценка уровня знаний студента</h1>
+    </header>
+    <main>
+        <div class="container">
+            <p id="result"></p>
+        </div>
+        
+    </main>
+    <script>
+        let name = prompt("Студент, введите ваше имя:");
+
+        if (!name) {
+            name = "'Без имени'";
+        }
+
+        let score = parseInt(prompt(`Какая ваша оценка ${name} (от 1 до 12)?`));
+
+        if (1 < score && score <= 3) {
+            level = "Начальный";
+        }
+
+        else if (4 <= score && score <= 6) {
+            level = "Средний";
+        }
+
+        else if (7 <= score && score <= 9) {
+            level = "Достаточный";
+        }
+
+        else if (10 <= score && score <= 12) {
+            level = "Высокий";
+        }
+
+        else {
+            level = ""
+        }
+
+        if (level) {
+            document.getElementById("result").textContent = `Студент ${name}, уровень ваших знаний: ${level}`;
+        }
+
+        else {
+            document.getElementById("result").textContent = `Вы ввели неверное значение оценки, ${name}!`;
+        }
+    </script>
+</body>
+</html>
