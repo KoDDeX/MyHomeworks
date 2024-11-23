@@ -1,0 +1,62 @@
+.book-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 220px;
+    height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px black;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin: 10px;
+    padding: 10px;
+  }
+  .book-cont {
+    display: flex;
+    justify-content: center;
+    min-width: 220px;
+  }
+  .book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px black;
+  }
+  .card-author {
+    font-weight: bold;
+    color: #555;
+  }
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+  }
+  .card-img-top {
+    max-height: 300px; /* Ограничиваем максимальную высоту изображения */
+    width: auto;
+    object-fit: contain; /* Сохраняем пропорции и избегаем обрезки */
+    margin: 0 auto; /* Центрируем изображение */
+    display: block; /* Обеспечиваем правильное выравнивание */
+  }
+  .card-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    -webkit-box-orient: vertical;
+  }
+  .container {
+    display: flex;
+    justify-content: space-between;
+  }
+footer {
+    text-align: center;
+    margin: 40px 0 0 0;
+}
+.footer-advert {
+    font-size: 12px;
+}
+.row {
+  display: flex;
+  justify-content: center;
+}
