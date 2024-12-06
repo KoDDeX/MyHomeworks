@@ -24,7 +24,7 @@ def format_weather_message(weather_dict: dict) -> str:
     """
     Форматирует данные о погоде в удобочитаемое сообщение.
     """
-    return f'Температура: {weather_dict["main"]["temp"]}°C\nОщущается как: {weather_dict["main"]["feels_like"]}°C\nОписание: {weather_dict["weather"][0]["description"]}'
+    return f'Температура: {round(weather_dict["main"]["temp"])}°C\nОщущается как: {round(weather_dict["main"]["feels_like"])}°C\nОписание: {weather_dict["weather"][0]["description"]}'
 
 
 def notify_weather(message: str) -> None:
@@ -32,7 +32,7 @@ def notify_weather(message: str) -> None:
     Отправляет уведомление пользователю с информацией о погоде.
     """
     notification.notify(
-        title=f"Погода в городе {CITY}",
+        title=f"Погода в городе: {CITY}",
         message=message,
         app_name="Weather",
         app_icon=None,
