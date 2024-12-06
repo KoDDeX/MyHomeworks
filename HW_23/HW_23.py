@@ -29,9 +29,11 @@ def notify_weather (message: str) -> None:
     Отправляет уведомление пользователю с информацией о погоде.
     """
     notification.notify(
-        title='Погода',
-        message=message,
-        timeout=10
+        title = f'Погода в городе {CITY}',
+        message = message,
+        app_name = 'Weather',
+        app_icon = None,
+        timeout = 10
     )
 
 def main () -> None:
@@ -42,4 +44,4 @@ def main () -> None:
     message = format_weather_message(weather_data)
     notify_weather(message)
 
-    
+main()
