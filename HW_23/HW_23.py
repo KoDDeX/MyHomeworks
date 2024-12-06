@@ -8,6 +8,7 @@ import requests
 from plyer import notification
 
 API_KEY = r'167349a6d42610462c6f5bd91a7c2e36'
+CITY = 'Обнинск'
 
 def get_weather(city: str, api_key: str) -> dict:
     """
@@ -32,3 +33,13 @@ def notify_weather (message: str) -> None:
         message=message,
         timeout=10
     )
+
+def main () -> None:
+    """
+    Запускает программу, выполняет вызовы вышеуказанных функций и обрабатывает вывод.
+    """
+    weather_data = get_weather(CITY, API_KEY)
+    message = format_weather_message(weather_data)
+    notify_weather(message)
+
+    
