@@ -6,6 +6,7 @@ HomeWork 24
 Кроме того, создадим тесты для этих функций, чтобы убедиться в корректной работе кода.
 """
 import json
+import os
 
 def file_exist(file_path: str) -> bool:
     """
@@ -23,3 +24,16 @@ def read_json(file_path: str, encoding: str = 'utf-8') -> dict:
         with open(file_path, 'r', encoding=encoding) as file:
             return json.load(file)
 
+def write_json(data, file_path: str, encoding: str = "utf-8") -> None:
+    """"
+    Функция для записи данных в JSON-файл.
+    """
+    with open(file_path, 'w', encoding=encoding) as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
+
+def append_json(data: list[dict], file_path: str, encoding: str = "utf-8") -> None:
+    """
+    Функция для добавления данных в существующий JSON-файл
+    """
+    with open(file_path, 'a', encoding=encoding) as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
