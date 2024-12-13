@@ -7,33 +7,94 @@ HomeWork 24
 """
 import json
 import os
+import csv
+import yaml
 
-def file_exist(file_path: str) -> bool:
+def file_exist(file_path: str):
     """
     Функция для проверки существования файла.
     """
-    return os.path.exists(file_path)
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Файл '{file_path}' не существует.")
+    return True
 
-def read_json(file_path: str, encoding: str = 'utf-8') -> dict:
+def read_json(file_path: str, encoding: str = 'utf-8-sig') -> dict:
     """
     Функция для чтения данных из файла JSON.
     """
-    if not file_exist(file_path):
-        raise FileNotFoundError(f"File '{file_path}' does not exist.")
-    else:
+    if file_exist(file_path):
         with open(file_path, 'r', encoding=encoding) as file:
             return json.load(file)
 
-def write_json(data, file_path: str, encoding: str = "utf-8") -> None:
+def write_json(data, file_path: str, encoding: str = "utf-8-sig") -> None:
     """"
     Функция для записи данных в JSON-файл.
     """
-    with open(file_path, 'w', encoding=encoding) as file:
-        json.dump(data, file, indent=4, ensure_ascii=False)
+    if file_exist(file_path):
+        with open(file_path, 'w', encoding=encoding) as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
 
-def append_json(data: list[dict], file_path: str, encoding: str = "utf-8") -> None:
+def append_json(data: list[dict], file_path: str, encoding: str = "utf-8-sig") -> None:
     """
     Функция для добавления данных в существующий JSON-файл
     """
-    with open(file_path, 'a', encoding=encoding) as file:
-        json.dump(data, file, indent=4, ensure_ascii=False)
+    if file_exist(file_path):
+        with open(file_path, 'a', encoding=encoding) as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
+
+def read_csv(file_path: str, delimiter: str = ';', encoding: str = 'utf-8-sig') -> list:
+    """
+    Функция для чтения данных из файла CSV.
+    """
+    if file_exist(file_path):
+        with open(file_path, 'r', encoding=encoding) as file:
+            table_list = list(csv.reader(file, delimiter=delimiter))
+            return table_list
+
+def write_csv(data: list, file_path: str, delimiter: str = ';', encoding: str = 'utf-8-sig') -> None:
+    """
+    Функция для записи данных в CSV-файл.
+    """
+    with open(file_path, 'w', encoding=encoding) as file:
+        writer = csv.writer(file, delimiter=delimiter)
+        writer.writerows(data)
+
+def append_csv(data: list, file_path: str, delimiter: str = ';', encoding: str = 'utf-8-sig') -> None:
+    """
+    Функция для добавления данных в существующий CSV-файл
+    """
+    if file_exist(file_path):
+        with open(file_path, 'a', encoding=encoding) as file:
+            writer = csv.writer(file, delimiter=delimiter)
+            writer.writerows(data)
+
+def read_txt(file_path: str, encoding: str = 'utf-8-sig') -> str:
+    """
+    Функция для чтения данных из текстового файла.
+    """
+    if file_exist(file_path):
+        with open(file_path, 'r', encoding=encoding) as file:
+            return file.read()
+
+def write_txt(data: str, file_path: str, encoding: str = 'utf-8-sig') -> None:
+    """
+    Функция для записи данных в текстовый файл.
+    """
+    with open(file_path, 'w', encoding=encoding) as file:
+        file.write(data)
+
+def append_txt(data: str, file_path: str, encoding: str = 'utf-8-sig') -> None:
+    """
+    Функция для добавления данных в существующий текстовый файл
+    """
+    if file_exist(file_path):
+        with open(file_path, 'a', encoding=encoding) as file:
+            file.write(data)
+
+def read_yaml(file_path: str, encoding: str = 'utf-8-sig') -> dict:
+    """
+    Функция для чтения данных из файла YAML.
+    """
+    if file_exist(file_path):
+        with open(file_path, 'r', encoding=encoding) as file:
+            return yaml.load(file, Loader=yaml.FullLoader)
