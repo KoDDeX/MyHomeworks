@@ -27,29 +27,29 @@ append_list = [
 ]
 
 # Тестируем JSON
-files_utils.write_json(table_list, 'test.json')
-test_json = files_utils.read_json('test.json')
+files_utils.write_json(table_list, './HW_24/test.json')
+test_json = files_utils.read_json('./HW_24/test.json')
 print(test_json)
-files_utils.append_json(append_list, 'test.json')
-test_json = files_utils.read_json('test.json')
+files_utils.append_json(append_list, './HW_24/test.json')
+test_json = files_utils.read_json('./HW_24/test.json')
 print(test_json)
 
 # Тестируем CSV
-files_utils.write_csv(table_list, 'test.csv')
-test_csv = files_utils.read_csv('test.csv')
+files_utils.write_csv(table_list, './HW_24/test.csv')
+test_csv = files_utils.read_csv('./HW_24/test.csv')
 print(test_csv)
-files_utils.append_csv(append_list, 'test.csv')
-test_csv = files_utils.read_csv('test.csv')
+files_utils.append_csv(append_list, './HW_24/test.csv')
+test_csv = files_utils.read_csv('./HW_24/test.csv')
 print(test_csv)       
 
 # Тестируем TXT
-files_utils.write_txt(table_list, 'test.txt')
-test_txt = files_utils.read_txt('test.txt')
+files_utils.write_txt(table_list, './HW_24/test.txt')
+test_txt = files_utils.read_txt('./HW_24/test.txt')
 print(test_txt)
-files_utils.append_txt(append_list, 'test.txt')
-test_txt = files_utils.read_txt('test.txt')
+files_utils.append_txt(append_list, './HW_24/test.txt')
+test_txt = files_utils.read_txt('./HW_24/test.txt')
 print(test_txt)
 
 # Тестируем YAML
-test_yaml = files_utils.read_yaml('test.yaml')
+test_yaml = files_utils.read_yaml('./HW_24/test.yaml')
 print(test_yaml)
