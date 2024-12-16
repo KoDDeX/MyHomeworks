@@ -35,9 +35,17 @@ append_list = [
 # print(test_json)
 
 # Тестируем CSV
-files_utils.write_csv(table_list, 'test.csv')
-test_csv = files_utils.read_csv('test.csv')
-print(test_csv)
-files_utils.append_csv(append_list, 'test.csv')
-test_csv = files_utils.read_csv('test.csv')
-print(test_csv)
+# files_utils.write_csv(table_list, 'test.csv')
+# test_csv = files_utils.read_csv('test.csv')
+# print(test_csv)
+# files_utils.append_csv(append_list, 'test.csv')
+# test_csv = files_utils.read_csv('test.csv')
+# print(test_csv)       
+
+# Тестируем TXT
+# files_utils.write_txt(table_list, 'test.txt')
+# test_txt = files_utils.read_txt('test.txt')
+# print(test_txt)
+# files_utils.append_txt(append_list, 'test.txt')
+# test_txt = files_utils.read_txt('test.txt')
+# print(test_txt)

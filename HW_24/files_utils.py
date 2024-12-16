@@ -76,28 +76,45 @@ def append_csv(data: list[dict], file_path: str, delimiter: str = ';', encoding:
                 writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter=delimiter)
                 writer.writerow(row)
 
-def read_txt(file_path: str, encoding: str = 'utf-8-sig') -> str:
+def read_txt(file_path: str, encoding: str = 'utf-8-sig') -> list[dict]:
     """
     Функция для чтения данных из текстового файла.
     """
     if file_exist(file_path):
         with open(file_path, 'r', encoding=encoding) as file:
-            return file.read()
+            result = list()
+            for line in file:
+                row_dict = dict()                
+                row = list(map(str, line.strip('\n').split(';')))
+                for i in row:
+                    key, value = i.split(':')
+                    row_dict[key] = value
+                result.append(row_dict)
+            return result
 
-def write_txt(data: str, file_path: str, encoding: str = 'utf-8-sig') -> None:
+def write_txt(data: list[dict], file_path: str, encoding: str = 'utf-8-sig') -> None:
     """
     Функция для записи данных в текстовый файл.
     """
     with open(file_path, 'w', encoding=encoding) as file:
-        file.write(data)
+        for row in data:
+            result = ""
+            for key, value in row.items():
+                result += f"{key}:{value};"
+            file.write(result[:-1] + '\n')
+        # file.write(data)
 
-def append_txt(data: str, file_path: str, encoding: str = 'utf-8-sig') -> None:
+def append_txt(data: list[dict], file_path: str, encoding: str = 'utf-8-sig') -> None:
     """
     Функция для добавления данных в существующий текстовый файл
     """
     if file_exist(file_path):
         with open(file_path, 'a', encoding=encoding) as file:
-            file.write(data)
+            for row in data:
+                result = ""
+                for key, value in row.items():
+                    result += f"{key}:{value};"
+                file.write(result[:-1] + '\n')
 
 def read_yaml(file_path: str, encoding: str = 'utf-8-sig') -> list:
     """
