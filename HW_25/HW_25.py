@@ -19,3 +19,7 @@ full_dict_che = dict(filter(lambda x: x[1]['title'][0].lower() == 'ч', full_dic
 # Отсортировал словарь по названию фильма ['title']
 full_dict_sorted = dict(sorted(full_dict.items(), key=lambda x: x[1]['title'] if x[1]['title'] != None else ''))
 # pprint(full_dict_sorted, sort_dicts=False)
+
+# Осортировал словарь по режисеру ['director'] и названию фильма ['title']
+full_dict_sorted_year = dict(sorted(full_dict.items(), key=lambda x: (x[1]['director'], x[1]['title'] if x[1]['title'] != None else '')))
+# pprint(full_dict_sorted_year, sort_dicts=False)
