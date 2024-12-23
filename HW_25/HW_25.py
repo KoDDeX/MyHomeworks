@@ -13,7 +13,7 @@ director_set = {val['director'] for val in films_dict.values()}
 full_dict_years = {k:{k1:str(v1) for (k1, v1) in v.items()} for (k, v) in full_dict.items()}
 # pprint(full_dict_years)
 
-full_dict_che = dict(filter(lambda x: x[1]['title'][0].lower() == 'ч', full_dict_years.items()))
+full_dict_che = dict(filter(lambda x: x[1]['title'][0].lower() == 'ч' if x[1]['title'] != None else '', full_dict.items()))
 # pprint(full_dict_che)
 
 # Отсортировал словарь по названию фильма ['title']
@@ -21,5 +21,9 @@ full_dict_sorted = dict(sorted(full_dict.items(), key=lambda x: x[1]['title'] if
 # pprint(full_dict_sorted, sort_dicts=False)
 
 # Осортировал словарь по режисеру ['director'] и названию фильма ['title']
-full_dict_sorted_year = dict(sorted(full_dict.items(), key=lambda x: (x[1]['director'], x[1]['title'] if x[1]['title'] != None else '')))
+full_dict_sorted_x2 = dict(sorted(full_dict.items(), key=lambda x: (x[1]['director'], x[1]['title'] if x[1]['title'] != None else '')))
 # pprint(full_dict_sorted_year, sort_dicts=False)
+
+# Однострочник с использованием фильтрации (по году с 2015) и сортировки по (году и названию)
+full_dict_option = dict(sorted(filter(lambda x: x[1]['year'] >= 2015 if isinstance(x[1]['year'], int) else '', full_dict.items()), key=lambda x: (x[1]['year'] if isinstance(x[1]['year'], int) else '', x[1]['title'] if x[1]['title'] != None else '')))
+# pprint(full_dict_option, sort_dicts=False)
