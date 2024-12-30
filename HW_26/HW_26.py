@@ -23,3 +23,13 @@ def password_checker(func: Callable) -> Callable:
             raise ValueError('Пароль должен содержать хотя бы один спецсимвол')
         return func(password)
     return wrapper
+
+@password_checker
+def register_user(password: str) -> None:
+    """
+    Функция для регистрации пользователя
+    """
+    pass
+    return f'Регистрация прошла успешно.'
+
+print(register_user(input('Введите пароль: ')))
