@@ -15,20 +15,15 @@ def password_checker(func: Callable) -> Callable:
     def wrapper(password: str) -> Callable:
         errors = []
         if len(password) < 8:
-            errors.append('***Пароль должен содержать не менее 8 символов')
-            # raise ValueError('Пароль должен содержать не менее 8 символов')
+            errors.append('\tПароль должен содержать не менее 8 символов')
         if not any(char.isdigit() for char in password):
-            errors.append('***Пароль должен содержать хотя бы одну цифру')
-            # raise ValueError('Пароль должен содержать хотя бы одну цифру')
+            errors.append('\tПароль должен содержать хотя бы одну цифру')
         if not any(char.islower() for char in password if char.isalpha()):
-            errors.append('***Пароль должен содержать хотя бы одну строчную букву')
-            # raise ValueError('Пароль должен содержать хотя бы одну строчную букву')
+            errors.append('\tПароль должен содержать хотя бы одну строчную букву')
         if not any(char.isupper() for char in password if char.isalpha()):
-            errors.append('***Пароль должен содержать хотя бы одну заглавную букву')
-            # raise ValueError('Пароль должен содержать хотя бы одну заглавную букву')
+            errors.append('\tПароль должен содержать хотя бы одну заглавную букву')
         if not any(char in '.,;:!?_*-+()/#¤@%&)' for char in password):
-            errors.append('***Пароль должен содержать хотя бы один спецсимвол')
-            # raise ValueError('Пароль должен содержать хотя бы один спецсимвол')
+            errors.append('\tПароль должен содержать хотя бы один спецсимвол')
         if errors:
             raise ValueError('\n'.join(errors))
         return func(password)
@@ -88,21 +83,16 @@ def password_validator(min_length: int = 8, min_uppercase: int = 1, min_lowercas
         def inner(username: str, password: str) -> Callable:
             errors = []
             if len(password) < min_length:
-                errors.append(f'***Пароль должен содержать не менее {min_length} символов.')
-                # raise ValueError(f'Пароль должен содержать не менее {min_length} символов.')
+                errors.append(f'\tПароль должен содержать не менее {min_length} символов.')
             if [char.isupper() for char in password if char.isalpha()].count(True) < min_uppercase:
-                errors.append(f'***Пароль должен содержать заглавные буквы в колличестве не менее: {min_uppercase} штук.')
-                # raise ValueError(f'Пароль должен содержать заглавные буквы в колличестве не менее: {min_uppercase} штук.')
+                errors.append(f'\tПароль должен содержать заглавные буквы в колличестве не менее: {min_uppercase} штук.')
             if [char.islower() for char in password if char.isalpha()].count(True) < min_lowercase:
-                errors.append(f'***Пароль должен содержать строчные буквы в колличестве не менее: {min_lowercase} штук.')
-                # raise ValueError(f'Пароль должен содержать строчные буквы в колличестве не менее: {min_lowercase} штук.')
+                errors.append(f'\tПароль должен содержать строчные буквы в колличестве не менее: {min_lowercase} штук.')
             # Исключаем символ ":", так как он используется в csv файле для разделения полей
             if any(char == ':' for char in password):
-                errors.append('***Пароль не должен содержать символ ":"')
-                # raise ValueError('Пароль не должен содержать символ ":"')
+                errors.append('\tПароль не должен содержать символ ":"')
             if [char in '.,;!?_*-+()/#¤%@&)' for char in password].count(True) < min_special_chars:
-                errors.append(f'***Пароль должен содержать спецсимволы в колличестве не менее: {min_special_chars} штук.')
-                # raise ValueError(f'Пароль должен содержать спецсимволы в колличестве не менее: {min_special_chars} штук.')
+                errors.append(f'\tПароль должен содержать спецсимволы в колличестве не менее: {min_special_chars} штук.')
             if errors:
                 raise ValueError('\n'.join(errors))
             return func(username, password)
@@ -119,11 +109,9 @@ def username_validator(func: Callable) -> Callable:
         errors = []
         # Исключаем символ ":", так как он используется в csv файле для разделения полей
         if any(char == ':' for char in username):
-            errors.append('***Логин не должен содержать символ ":"')
-            # raise ValueError('Логин не должен содержать символ ":"')
+            errors.append('\tЛогин не должен содержать символ ":"')
         if [char for char in username].count(' ') > 0:
-            errors.append('***Логин не должен содержать пробелы.')
-            # raise ValueError('Логин не должен содержать пробелы.')
+            errors.append('\tЛогин не должен содержать пробелы.')
         if errors:
             raise ValueError('\n'.join(errors))
         return(func(username, password))
