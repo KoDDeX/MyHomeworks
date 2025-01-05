@@ -2,28 +2,35 @@
 Домашнее задание № 26
 Часть 1: Декоратор для валидации пароля
 """
-
 from typing import Tuple, Callable
 import csv
 import os
 
-ACCESS_FILE = 'acl.csv'
+print('Часть 1: Декоратор для валидации пароля')
 
 def password_checker(func: Callable) -> Callable:
     """
     Декоратор для валидации пароля
     """
     def wrapper(password: str) -> Callable:
+        errors = []
         if len(password) < 8:
-            raise ValueError('Пароль должен содержать не менее 8 символов')
+            errors.append('***Пароль должен содержать не менее 8 символов')
+            # raise ValueError('Пароль должен содержать не менее 8 символов')
         if not any(char.isdigit() for char in password):
-            raise ValueError('Пароль должен содержать хотя бы одну цифру')
+            errors.append('***Пароль должен содержать хотя бы одну цифру')
+            # raise ValueError('Пароль должен содержать хотя бы одну цифру')
         if not any(char.islower() for char in password if char.isalpha()):
-            raise ValueError('Пароль должен содержать хотя бы одну строчную букву')
+            errors.append('***Пароль должен содержать хотя бы одну строчную букву')
+            # raise ValueError('Пароль должен содержать хотя бы одну строчную букву')
         if not any(char.isupper() for char in password if char.isalpha()):
-            raise ValueError('Пароль должен содержать хотя бы одну заглавную букву')
+            errors.append('***Пароль должен содержать хотя бы одну заглавную букву')
+            # raise ValueError('Пароль должен содержать хотя бы одну заглавную букву')
         if not any(char in '.,;:!?_*-+()/#¤@%&)' for char in password):
-            raise ValueError('Пароль должен содержать хотя бы один спецсимвол')
+            errors.append('***Пароль должен содержать хотя бы один спецсимвол')
+            # raise ValueError('Пароль должен содержать хотя бы один спецсимвол')
+        if errors:
+            raise ValueError('\n'.join(errors))
         return func(password)
     return wrapper
 
@@ -34,16 +41,37 @@ def register_user(password: str) -> str:
     """
     return f'Регистрация прошла успешно.'
 
-# print(register_user(input('Введите пароль: ')))
+try:
+    print(register_user(input('Введите пароль: ')))
+except ValueError as e:
+    print(f'Ошибка регистрации:\n{e}')
+
 
 """
-mypy HW_26\HW_26.py
-*** Success: no issues found in 1 source file
+    mypy HW_26.py 
+    *** Success: no issues found in 1 source file
 """
 
 """
 Часть 2: Декораторы для валидации данных
 """
+
+ACCESS_FILE = 'acl.csv'
+
+print('Часть 2: Декораторы для валидации данных')
+
+def create_logger(log_prefix: str) -> Callable:
+    """
+    Дополнительное замыкание (логирование операций) (опционально)
+    """
+    def log_registration() -> str:
+        username: str = input(f'{log_prefix}: Введите логин: ')
+        password: str = input(f'{log_prefix}: Введите пароль: ')
+        print(f"{log_prefix}: Попытка регистрации пользователя {username}")
+        result = register_user2(username, password)
+        print(f"{log_prefix}: {result}")
+        return result
+    return log_registration
 
 def password_validator(min_length: int = 8, min_uppercase: int = 1, min_lowercase: int = 1, min_special_chars: int = 1) -> Callable:
     """
@@ -58,49 +86,72 @@ def password_validator(min_length: int = 8, min_uppercase: int = 1, min_lowercas
     """
     def wrapper(func: Callable) -> Callable:
         def inner(username: str, password: str) -> Callable:
+            errors = []
             if len(password) < min_length:
-                raise ValueError(f'Пароль должен содержать не менее {min_length} символов.')
+                errors.append(f'***Пароль должен содержать не менее {min_length} символов.')
+                # raise ValueError(f'Пароль должен содержать не менее {min_length} символов.')
             if [char.isupper() for char in password if char.isalpha()].count(True) < min_uppercase:
-                raise ValueError(f'Пароль должен содержать заглавные буквы в колличестве не менее: {min_uppercase} штук.')
+                errors.append(f'***Пароль должен содержать заглавные буквы в колличестве не менее: {min_uppercase} штук.')
+                # raise ValueError(f'Пароль должен содержать заглавные буквы в колличестве не менее: {min_uppercase} штук.')
             if [char.islower() for char in password if char.isalpha()].count(True) < min_lowercase:
-                raise ValueError(f'Пароль должен содержать строчные буквы в колличестве не менее: {min_lowercase} штук.')
+                errors.append(f'***Пароль должен содержать строчные буквы в колличестве не менее: {min_lowercase} штук.')
+                # raise ValueError(f'Пароль должен содержать строчные буквы в колличестве не менее: {min_lowercase} штук.')
             # Исключаем символ ":", так как он используется в csv файле для разделения полей
             if any(char == ':' for char in password):
-                raise ValueError('Пароль не должен содержать символ ":"')
+                errors.append('***Пароль не должен содержать символ ":"')
+                # raise ValueError('Пароль не должен содержать символ ":"')
             if [char in '.,;!?_*-+()/#¤%@&)' for char in password].count(True) < min_special_chars:
-                raise ValueError(f'Пароль должен содержать спецсимволы в колличестве не менее: {min_special_chars} штук.')
+                errors.append(f'***Пароль должен содержать спецсимволы в колличестве не менее: {min_special_chars} штук.')
+                # raise ValueError(f'Пароль должен содержать спецсимволы в колличестве не менее: {min_special_chars} штук.')
+            if errors:
+                raise ValueError('\n'.join(errors))
             return func(username, password)
         return inner
     return wrapper
 
-def username_validator(func: callable) -> Callable:
+def username_validator(func: Callable) -> Callable:
     """
     **Функциональность**:
         - Проверяет, что в имени пользователя отсутствуют пробелы.
         - Если в имени пользователя есть пробелы, выбрасывает `ValueError` с описанием проблемы.
     """
     def wrapper(username: str, password: str) -> Callable:
+        errors = []
         # Исключаем символ ":", так как он используется в csv файле для разделения полей
         if any(char == ':' for char in username):
-            raise ValueError('Логин не должен содержать символ ":"')
+            errors.append('***Логин не должен содержать символ ":"')
+            # raise ValueError('Логин не должен содержать символ ":"')
         if [char for char in username].count(' ') > 0:
-            raise ValueError('Логин не должен содержать пробелы.')
+            errors.append('***Логин не должен содержать пробелы.')
+            # raise ValueError('Логин не должен содержать пробелы.')
+        if errors:
+            raise ValueError('\n'.join(errors))
         return(func(username, password))
     return wrapper
 
 @username_validator
 @password_validator(min_length=8, min_uppercase=1, min_lowercase=1, min_special_chars=1)
-def register_user(username: str, password: str) -> str:
+def register_user2(username: str, password: str) -> str:
     """
         - Принимает `username` и `password`.
         - **Функциональность**:
         - Дозаписывает имя пользователя и пароль в CSV файл.
         - Оборачивается обоими декораторами для валидации данных.
     """
-    row = {'username': username, 'password': password}
+    row: dict = {'username': username, 'password': password}
     with open(ACCESS_FILE, 'a', encoding = 'utf-8-sig', newline = "") as file:
         writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter = ':')
         writer.writerow(row)
     return f'Регистрация прошла успешно.'
 
-print(register_user(input('Введите логин: '),input('Введите пароль: ')))
+register_with_logging = create_logger("[REGISTRATION]")
+
+try:
+    register_with_logging()
+except ValueError as e:
+    print(f'Ошибка регистрации:\n{e}')
+
+"""
+    mypy HW_26.py
+    *** Success: no issues found in 1 source file
+"""
