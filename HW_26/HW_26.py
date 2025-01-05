@@ -4,7 +4,10 @@
 """
 
 from typing import Tuple, Callable
+import csv
+import os
 
+ACCESS_FILE = 'acl.csv'
 
 def password_checker(func: Callable) -> Callable:
     """
@@ -19,7 +22,7 @@ def password_checker(func: Callable) -> Callable:
             raise ValueError('Пароль должен содержать хотя бы одну строчную букву')
         if not any(char.isupper() for char in password if char.isalpha()):
             raise ValueError('Пароль должен содержать хотя бы одну заглавную букву')
-        if not any(char in '.,:;!?_*-+()/#¤%&)' for char in password):
+        if not any(char in '.,;:!?_*-+()/#¤@%&)' for char in password):
             raise ValueError('Пароль должен содержать хотя бы один спецсимвол')
         return func(password)
     return wrapper
@@ -61,7 +64,10 @@ def password_validator(min_length: int = 8, min_uppercase: int = 1, min_lowercas
                 raise ValueError(f'Пароль должен содержать заглавные буквы в колличестве не менее: {min_uppercase} штук.')
             if [char.islower() for char in password if char.isalpha()].count(True) < min_lowercase:
                 raise ValueError(f'Пароль должен содержать строчные буквы в колличестве не менее: {min_lowercase} штук.')
-            if [char in '.,:;!?_*-+()/#¤%&)' for char in password].count(True) < min_special_chars:
+            # Исключаем символ ":", так как он используется в csv файле для разделения полей
+            if any(char == ':' for char in password):
+                raise ValueError('Пароль не должен содержать символ ":"')
+            if [char in '.,;!?_*-+()/#¤%@&)' for char in password].count(True) < min_special_chars:
                 raise ValueError(f'Пароль должен содержать спецсимволы в колличестве не менее: {min_special_chars} штук.')
             return func(username, password)
         return inner
@@ -74,20 +80,27 @@ def username_validator(func: callable) -> Callable:
         - Если в имени пользователя есть пробелы, выбрасывает `ValueError` с описанием проблемы.
     """
     def wrapper(username: str, password: str) -> Callable:
+        # Исключаем символ ":", так как он используется в csv файле для разделения полей
+        if any(char == ':' for char in username):
+            raise ValueError('Логин не должен содержать символ ":"')
         if [char for char in username].count(' ') > 0:
             raise ValueError('Логин не должен содержать пробелы.')
         return(func(username, password))
     return wrapper
 
-@password_validator(min_length=8, min_uppercase=1, min_lowercase=1, min_special_chars=1)
 @username_validator
+@password_validator(min_length=8, min_uppercase=1, min_lowercase=1, min_special_chars=1)
 def register_user(username: str, password: str) -> str:
     """
-        - **Аргументы**: Принимает `username` и `password`.
+        - Принимает `username` и `password`.
         - **Функциональность**:
         - Дозаписывает имя пользователя и пароль в CSV файл.
         - Оборачивается обоими декораторами для валидации данных.
     """
+    row = {'username': username, 'password': password}
+    with open(ACCESS_FILE, 'a', encoding = 'utf-8-sig', newline = "") as file:
+        writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter = ':')
+        writer.writerow(row)
     return f'Регистрация прошла успешно.'
 
 print(register_user(input('Введите логин: '),input('Введите пароль: ')))
