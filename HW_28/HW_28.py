@@ -23,9 +23,7 @@ class TxtFileHandler:
         with open(file_path, "r", encoding=encoding) as file:
             return file.read()
 
-    def write_file(
-        self, file_path: str, data: str, encoding: str = "utf-8-sig"
-    ) -> None:
+    def write_file(self, file_path: str, data: str, encoding: str = "utf-8-sig") -> None:
         """
         Метод для записи данных в TXT файл.
         :param file_path: str - Путь к файлу.
@@ -38,9 +36,7 @@ class TxtFileHandler:
         except PermissionError as e:
             raise PermissionError(f"Ошибка доступа к файлу файл: {e}")
 
-    def append_file(
-        self, file_path: str, data: str, encoding: str = "utf-8-sig"
-    ) -> None:
+    def append_file(self, file_path: str, data: str, encoding: str = "utf-8-sig") -> None:
         """
         Метод для дописывания данных в TXT файл.
         :param file_path: str - Путь к файлу.
@@ -49,3 +45,9 @@ class TxtFileHandler:
         """
         with open(file_path, "a", encoding=encoding) as file:
             file.write(data)
+
+handler = TxtFileHandler()
+print(handler.read_file("file.txt"))
+handler.write_file("my_file.txt", "This is a test string.\n")
+handler.append_file("my_file.txt", "This is another string.\n")
+print(handler.read_file("my_file.txt"))
