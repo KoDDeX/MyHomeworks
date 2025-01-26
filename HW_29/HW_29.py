@@ -28,9 +28,12 @@ class ImageCompressor:
         :param output_path: str - путь для сохранения сжатого изображения в формате HEIF
         :return: None
         """
-        with Image.open(input_path) as img:
-            img.save(output_path, format="HEIF", quality=self.__quality)
-        print(f'Сжато: {input_path} -> {output_path}')
+        if input_path.lower().endswith(self.supported_formats):
+            with Image.open(input_path) as img:
+                img.save(output_path, format="HEIF", quality=self.__quality)
+            print(f'Сжато: {input_path} -> {output_path}')
+        else:
+            print(f'Неподдерживаемый формат файла: {input_path}')
 
     def process_directory(self, directory: str) -> None:
         """
@@ -40,10 +43,9 @@ class ImageCompressor:
         """
         for root, _, files in os.walk(directory):
             for file in files:
-                if file.lower().endswith(self.supported_formats):
-                    input_path = os.path.join(root, file)
-                    output_path = os.path.join(root, file)
-                    self.compress_image(input_path, output_path)
+                input_path = os.path.join(root, file)
+                output_path = os.path.splitext(os.path.join(root, file))[0] + '.heif'
+                self.compress_image(input_path, output_path)
 
     @property
     def quality(self) -> int:
@@ -72,7 +74,7 @@ def main(input_path: str) -> None:
 
     if os.path.exists(input_path):
         img_compressor = ImageCompressor(50)
-        if os .path.isfile(input_path):
+        if os.path.isfile(input_path):
             # Если указан путь к файлу, обрабатываем только этот файл
             print(f'Обрабатываем файл: {input_path}')
             output_path = os.path.splitext(input_path)[0] + '.heif'
@@ -87,4 +89,3 @@ def main(input_path: str) -> None:
 if __name__ == '__main__':
     user_input = input('Введите путь к файлу или директории для обработки: ')
     main(user_input)
-    
