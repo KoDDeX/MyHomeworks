@@ -84,3 +84,35 @@ class TxtFile(AbstractFile):
             file.write(data)
 
 
+class CsvFile(AbstractFile):
+    """
+    Класс для работы с CSV-файлами.
+    """
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+    
+    def read(self, delimiter: str = ';', encoding: str = 'utf-8-sig'):
+        """
+        Метод для чтения данных из CSV-файла.
+        """
+        if os.path.exists(self.file_path):
+            with open(self.file_path, 'r', encoding=encoding) as file:
+                reader = csv.reader(file, delimiter=delimiter)
+                return [row for row in reader]
+        else:
+            raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
+    def write(self, data: list[list], delimiter: str = ';', encoding: str = 'utf-8-sig'):
+        """
+        Метод для записи данных в CSV-файл.
+        """
+        with open(self.file_path, 'w', encoding=encoding) as file:
+            writer = csv.writer(file, delimiter=delimiter)
+            writer.writerows(data)
+    def append(self, data: list[list], delimiter: str = ';', encoding: str = 'utf-8-sig'):
+        """
+        Метод для добавления данных в существующий CSV-файл.
+        """
+        if os.path.exists(self.file_path):
+            with open(self.file_path, 'a', encoding=encoding) as file:
+                writer = csv.writer(file, delimiter=delimiter)
+                writer.writerows(data)
