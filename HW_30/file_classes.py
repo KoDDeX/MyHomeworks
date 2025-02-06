@@ -13,23 +13,25 @@ class AbstractFile(ABC):
         self.file_path = file_path
 
     @abstractmethod
-    def read(self):
+    def read(self) -> list[dict]:
         """
         Метод чтения данных
         """
         pass
 
     @abstractmethod
-    def write(self, data: list[dict]):
+    def write(self, data: list[dict]) -> None:
         """
         Метод записи данных
+        :data: list[dict] - данные для записи в файл.
         """
         pass
 
     @abstractmethod
-    def append(self, data: list[dict]):
+    def append(self, data: list[dict]) -> None:
         """
         Метод добавления данных
+        :data: list[dict] - данные для добавления в файл.
         """
         pass
 
@@ -46,7 +48,7 @@ class JsonFile(AbstractFile):
     """
     Класс для работы с JSON-файлами.
     """
-    def read(self, encoding: str = 'utf-8-sig') -> dict:
+    def read(self, encoding: str = 'utf-8-sig') -> list[dict]:
         """
         Метод для чтения данных из JSON-файла.
         """
@@ -128,7 +130,7 @@ class CsvFile(AbstractFile):
     Класс для работы с CSV-файлами.
     """
 
-    def read(self, delimiter: str = ';', encoding: str = 'utf-8-sig') -> list:
+    def read(self, delimiter: str = ';', encoding: str = 'utf-8-sig') -> list[dict]:
         """
         Метод для чтения данных из CSV-файла.
         """
