@@ -13,16 +13,33 @@ class AbstractFile(ABC):
         self.file_path = file_path
 
     @abstractmethod
-    def read():
+    def read(self):
+        """
+        Метод чтения данных
+        """
         pass
 
     @abstractmethod
-    def write(data: list[dict]):
+    def write(self, data: list[dict]):
+        """
+        Метод записи данных
+        """
         pass
 
     @abstractmethod
-    def append(data: list[dict]):
+    def append(self, data: list[dict]):
+        """
+        Метод добавления данных
+        """
         pass
+
+    def __bool__(self):
+        """
+        Метод проверки существования файла
+        """
+        if os.path.exists(self.file_path):
+            return True
+        raise FileNotFoundError(f"Файл '{self.file_path}' не найден.")
 
 
 class JsonFile(AbstractFile):
@@ -33,11 +50,10 @@ class JsonFile(AbstractFile):
         """
         Метод для чтения данных из JSON-файла.
         """
-        if os.path.exists(self.file_path):
+        if self:
             with open(self.file_path, 'r', encoding=encoding) as file:
                 return json.load(file)
-        else:
-            raise FileNotFoundError(f"Файл '{self.file_path}' не найден.")
+
 
     def write(self, data: list[dict], encoding: str = 'utf-8-sig') -> None:
         """
@@ -50,10 +66,10 @@ class JsonFile(AbstractFile):
         """
         Метод для добавления данных в существующий JSON-файл.
         """
-        if os.path.exists(self.file_path):
+        if self:
             with open(self.file_path, 'r', encoding=encoding) as file:
                 json_data = json.load(file)
-        json_data.extend(data)
+                json_data.extend(data)
         with open(self.file_path, 'w', encoding=encoding) as file:
             json.dump(json_data, file, indent=4, ensure_ascii=False)
 
@@ -68,7 +84,7 @@ class TxtFile(AbstractFile):
         Метод для чтения данных из текстового файла.
         :encoding: str - кодировка файла.
         """
-        if os.path.exists(self.file_path):
+        if self:
             with open(self.file_path, 'r', encoding=encoding) as file:
                 result = list()
                 for line in file:
@@ -79,8 +95,6 @@ class TxtFile(AbstractFile):
                         row_dict[key] = value
                     result.append(row_dict)
                 return result
-        else:
-            raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
 
     def write(self, data: list[dict], encoding: str = 'utf-8-sig') -> None:
         """
@@ -101,15 +115,12 @@ class TxtFile(AbstractFile):
         :data: list[dict] - данные для добавления в файл.
         :encoding: str - кодировка файла.
         """
-        if os.path.exists(self.file_path):
-            with open(self.file_path, 'a', encoding=encoding) as file:
-                for row in data:
-                    result = ""
-                    for key, value in row.items():
-                        result += f"{key}:{value};"
-                    file.write(result[:-1] + '\n')
-        else:
-            raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
+        with open(self.file_path, 'a', encoding=encoding) as file:
+            for row in data:
+                result = ""
+                for key, value in row.items():
+                    result += f"{key}:{value};"
+                file.write(result[:-1] + '\n')
 
 
 class CsvFile(AbstractFile):
@@ -121,12 +132,10 @@ class CsvFile(AbstractFile):
         """
         Метод для чтения данных из CSV-файла.
         """
-        if os.path.exists(self.file_path):
+        if self:
             with open(self.file_path, 'r', encoding=encoding) as file:
                 reader = csv.DictReader(file, delimiter=delimiter)
                 return list(reader)
-        else:
-            raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
 
     def write(self, data: list[dict], delimiter: str = ';', encoding: str = 'utf-8-sig') -> None:
         """
@@ -143,8 +152,7 @@ class CsvFile(AbstractFile):
         """
         Метод для добавления данных в существующий CSV-файл.
         """
-        if os.path.exists(self.file_path):
-            with open(self.file_path, 'a', encoding=encoding, newline='') as file:
-                for row in data:
-                    writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter=delimiter)
-                    writer.writerow(row)
+        with open(self.file_path, 'a', encoding=encoding, newline='') as file:
+            for row in data:
+                writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter=delimiter)
+                writer.writerow(row)
