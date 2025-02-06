@@ -17,11 +17,11 @@ class AbstractFile(ABC):
         pass
 
     @abstractmethod
-    def write(data: str):
+    def write(data: list[dict]):
         pass
 
     @abstractmethod
-    def append(data: str):
+    def append(data: list[dict]):
         pass
 
 
@@ -63,29 +63,53 @@ class TxtFile(AbstractFile):
     Класс для работы с текстовыми файлами.
     """
 
-    def read(self, encoding: str = 'utf-8-sig'):
+    def read(self, encoding: str = 'utf-8-sig') -> list[dict]:
         """
         Метод для чтения данных из текстового файла.
+        :encoding: str - кодировка файла.
         """
         if os.path.exists(self.file_path):
             with open(self.file_path, 'r', encoding=encoding) as file:
-                return file.read()
+                result = list()
+                for line in file:
+                    row_dict = dict()
+                    row = list(map(str, line.strip('\n').split(';')))
+                    for i in row:
+                        key, value = i.split(':')
+                        row_dict[key] = value
+                    result.append(row_dict)
+                return result
         else:
             raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
 
-    def write(self, data: str, encoding: str = 'utf-8-sig'):
+    def write(self, data: list[dict], encoding: str = 'utf-8-sig') -> None:
         """
         Метод для записи данных в текстовый файл.
+        :data: list[dict] - данные для записи в файл.
+        :encoding: str - кодировка файла.
         """
         with open(self.file_path, 'w', encoding=encoding) as file:
-            file.write(data)
+            for row in data:
+                result = ""
+                for key, value in row.items():
+                    result += f"{key}:{value};"
+                file.write(result[:-1] + '\n')
 
-    def append(self, data: str, encoding: str = 'utf-8-sig'):
+    def append(self, data: list[dict], encoding: str = 'utf-8-sig') -> None:
         """
         Метод для добавления данных в существующий текстовый файл.
+        :data: list[dict] - данные для добавления в файл.
+        :encoding: str - кодировка файла.
         """
-        with open(self.file_path, 'a', encoding=encoding) as file:
-            file.write(data)
+        if os.path.exists(self.file_path):
+            with open(self.file_path, 'a', encoding=encoding) as file:
+                for row in data:
+                    result = ""
+                    for key, value in row.items():
+                        result += f"{key}:{value};"
+                    file.write(result[:-1] + '\n')
+        else:
+            raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
 
 
 class CsvFile(AbstractFile):
@@ -99,8 +123,8 @@ class CsvFile(AbstractFile):
         """
         if os.path.exists(self.file_path):
             with open(self.file_path, 'r', encoding=encoding) as file:
-                table_list = list(csv.reader(file, delimiter=delimiter))
-                return table_list
+                reader = csv.DictReader(file, delimiter=delimiter)
+                return list(reader)
         else:
             raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
 

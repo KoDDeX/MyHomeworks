@@ -35,7 +35,7 @@ if __name__ == "__main__":
     json_file.append(append_list)
     test_json = json_file.read()
     print(f'JSON.append.test:\n{test_json}')
-    
+
     # Тестируем CSV
     csv_file = file_classes.CsvFile('./HW_30/test.csv')
     csv_file.write(table_list)
@@ -44,3 +44,12 @@ if __name__ == "__main__":
     csv_file.append(append_list)
     test_csv = csv_file.read()
     print(f'CSV.append.test:\n{test_csv}')
+
+    # Тестируем TXT
+    txt_file = file_classes.TxtFile('./HW_30/test.txt')
+    txt_file.write(table_list)
+    test_txt = txt_file.read()
+    print(f'TXT.write.test:\n{test_txt}')
+    txt_file.append(append_list)
+    test_txt = txt_file.read()
+    print(f'TXT.append.test:\n{test_txt}')
