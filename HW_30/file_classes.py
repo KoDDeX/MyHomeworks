@@ -3,16 +3,24 @@ HomeWork 30
 
 Создание классов для работы с различными типами файлов: JSON, TXT и CSV.
 """
-
+from abc import ABC, abstractmethod
 import os
 import json
 import csv
 
 class AbstractFile(ABC):
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+
+    @abstractmethod
     def read():
         pass
+
+    @abstractmethod
     def write(data: str):
         pass
+
+    @abstractmethod
     def append(data: str):
         pass
 
@@ -21,10 +29,7 @@ class JsonFile(AbstractFile):
     """
     Класс для работы с JSON-файлами.
     """
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-
-    def read(self, encoding: str = 'utf-8-sig'):
+    def read(self, encoding: str = 'utf-8-sig') -> dict:
         """
         Метод для чтения данных из JSON-файла.
         """
@@ -32,21 +37,22 @@ class JsonFile(AbstractFile):
             with open(self.file_path, 'r', encoding=encoding) as file:
                 return json.load(file)
         else:
-            raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
+            raise FileNotFoundError(f"Файл '{self.file_path}' не найден.")
 
-    def write(self, data: dict, encoding: str = 'utf-8-sig'):
+    def write(self, data: list[dict], encoding: str = 'utf-8-sig') -> None:
         """
         Метод для записи данных в JSON-файл.
         """
         with open(self.file_path, 'w', encoding=encoding) as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
-    def append(self, data: dict, encoding: str = 'utf-8-sig'):
+    def append(self, data: list[dict], encoding: str = 'utf-8-sig') -> None:
         """
         Метод для добавления данных в существующий JSON-файл.
         """
-        with open(self.file_path, 'r', encoding=encoding) as file:
-            json_data = json.load(file)
+        if os.path.exists(self.file_path):
+            with open(self.file_path, 'r', encoding=encoding) as file:
+                json_data = json.load(file)
         json_data.extend(data)
         with open(self.file_path, 'w', encoding=encoding) as file:
             json.dump(json_data, file, indent=4, ensure_ascii=False)
@@ -56,9 +62,7 @@ class TxtFile(AbstractFile):
     """
     Класс для работы с текстовыми файлами.
     """
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-    
+
     def read(self, encoding: str = 'utf-8-sig'):
         """
         Метод для чтения данных из текстового файла.
@@ -88,31 +92,35 @@ class CsvFile(AbstractFile):
     """
     Класс для работы с CSV-файлами.
     """
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-    
-    def read(self, delimiter: str = ';', encoding: str = 'utf-8-sig'):
+
+    def read(self, delimiter: str = ';', encoding: str = 'utf-8-sig') -> list:
         """
         Метод для чтения данных из CSV-файла.
         """
         if os.path.exists(self.file_path):
             with open(self.file_path, 'r', encoding=encoding) as file:
-                reader = csv.reader(file, delimiter=delimiter)
-                return [row for row in reader]
+                table_list = list(csv.reader(file, delimiter=delimiter))
+                return table_list
         else:
             raise FileNotFoundError(f"Файл '{self.file_path}' не существует.")
-    def write(self, data: list[list], delimiter: str = ';', encoding: str = 'utf-8-sig'):
+
+    def write(self, data: list[dict], delimiter: str = ';', encoding: str = 'utf-8-sig') -> None:
         """
         Метод для записи данных в CSV-файл.
         """
         with open(self.file_path, 'w', encoding=encoding) as file:
             writer = csv.writer(file, delimiter=delimiter)
-            writer.writerows(data)
-    def append(self, data: list[list], delimiter: str = ';', encoding: str = 'utf-8-sig'):
+            writer.writerow(data[0])
+            for row in data: 
+                writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter=delimiter)
+                writer.writerow(row)
+
+    def append(self, data: list[dict], delimiter: str = ';', encoding: str = 'utf-8-sig') -> None:
         """
         Метод для добавления данных в существующий CSV-файл.
         """
         if os.path.exists(self.file_path):
             with open(self.file_path, 'a', encoding=encoding) as file:
-                writer = csv.writer(file, delimiter=delimiter)
-                writer.writerows(data)
+            for row in data:
+                writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter=delimiter)
+                writer.writerow(row)
