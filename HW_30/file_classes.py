@@ -108,7 +108,7 @@ class CsvFile(AbstractFile):
         """
         Метод для записи данных в CSV-файл.
         """
-        with open(self.file_path, 'w', encoding=encoding) as file:
+        with open(self.file_path, 'w', encoding=encoding, newline='') as file:
             writer = csv.writer(file, delimiter=delimiter)
             writer.writerow(data[0])
             for row in data: 
@@ -120,7 +120,7 @@ class CsvFile(AbstractFile):
         Метод для добавления данных в существующий CSV-файл.
         """
         if os.path.exists(self.file_path):
-            with open(self.file_path, 'a', encoding=encoding) as file:
-            for row in data:
-                writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter=delimiter)
-                writer.writerow(row)
+            with open(self.file_path, 'a', encoding=encoding, newline='') as file:
+                for row in data:
+                    writer = csv.DictWriter(file, fieldnames=row.keys(), delimiter=delimiter)
+                    writer.writerow(row)
