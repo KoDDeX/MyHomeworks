@@ -1,4 +1,5 @@
 import file_classes
+from cities import cities_list
 
 table_list = [
     {"first_name": "Владимир", "middle_name": "Александрович", "last_name": "Монин"},
@@ -26,30 +27,34 @@ append_list = [
     {"first_name": "Петр", "middle_name": "Петрович", "last_name": "Петров"},
 ]
 
+# if __name__ == "__main__":
+#     # Тестируем JSON
+#     json_file = file_classes.JsonFile('./HW_30/test.json')
+#     json_file.write(table_list)
+#     test_json = json_file.read()
+#     print(f'JSON.write.test:\n{test_json}')
+#     json_file.append(append_list)
+#     test_json = json_file.read()
+#     print(f'JSON.append.test:\n{test_json}')
+
+#     # Тестируем CSV
+#     csv_file = file_classes.CsvFile('./HW_30/test.csv')
+#     csv_file.write(table_list)
+#     test_csv = csv_file.read()
+#     print(f'CSV.write.test:\n{test_csv}')
+#     csv_file.append(append_list)
+#     test_csv = csv_file.read()
+#     print(f'CSV.append.test:\n{test_csv}')
+
+#     # Тестируем TXT
+#     txt_file = file_classes.TxtFile('./HW_30/test.txt')
+#     txt_file.write(table_list)
+#     test_txt = txt_file.read()
+#     print(f'TXT.write.test:\n{test_txt}')
+#     txt_file.append(append_list)
+#     test_txt = txt_file.read()
+#     print(f'TXT.append.test:\n{test_txt}')
+
 if __name__ == "__main__":
-    # Тестируем JSON
-    json_file = file_classes.JsonFile('./HW_30/test.json')
-    json_file.write(table_list)
-    test_json = json_file.read()
-    print(f'JSON.write.test:\n{test_json}')
-    json_file.append(append_list)
-    test_json = json_file.read()
-    print(f'JSON.append.test:\n{test_json}')
-
-    # Тестируем CSV
-    csv_file = file_classes.CsvFile('./HW_30/test.csv')
-    csv_file.write(table_list)
-    test_csv = csv_file.read()
-    print(f'CSV.write.test:\n{test_csv}')
-    csv_file.append(append_list)
-    test_csv = csv_file.read()
-    print(f'CSV.append.test:\n{test_csv}')
-
-    # Тестируем TXT
-    txt_file = file_classes.TxtFile('./HW_30/test.txt')
-    txt_file.write(table_list)
-    test_txt = txt_file.read()
-    print(f'TXT.write.test:\n{test_txt}')
-    txt_file.append(append_list)
-    test_txt = txt_file.read()
-    print(f'TXT.append.test:\n{test_txt}')
+    json_file = file_classes.JsonFile('data.json')
+    json_file.write(cities_list)
