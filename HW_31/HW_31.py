@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 import random
 
 DATA_FILE = 'data.json'
-
+BAD_LETTERS = ('ь', 'ъ', 'ы')
 
 @dataclass
 class City:
@@ -84,12 +84,14 @@ class CitiesSerializer:
     def get_used_cities(self) -> set:
         return [city.name for city in self.cities if city._is_used]
     
+    def get_unused_cities(self, first_char: str) -> set:
+        return [city.name for city in self.cities if not city._is_used and city.name[0] == first_char]
+    
     def use_city(self, city_name: str) -> None:
         for city in self.cities:
             if city.name == city_name:
                 city._is_used = True
                 break
-
 
 class CityGame:
     """
@@ -118,7 +120,7 @@ class CityGame:
             print(f'У компьютера выпало {computer_dice}')
             if human_dice > computer_dice:
                 while not self.current_city:
-                    self.human_turn(input('Вы ходите первым. Введите название города: '))
+                    self.human_turn(input('Вы ходите первым. Введите название города: ').lower())
                 return True
             elif human_dice == computer_dice:
                 print('Ничья!')
@@ -126,15 +128,23 @@ class CityGame:
                 print('Компьютер ходит первым!')
                 return False
 
+    def set_current_city(self, city_name: str) -> None:
+        """
+        Метод для использования города.
+        """
+        self.cities.use_city(city_name)
+        self.current_city = city_name
+        if self.current_city[-1] in BAD_LETTERS:
+            self.current_city = self.current_city[:-1]
+
     def start_game(self):
         print('Добро пожаловать в игру "Города"!')
         self.is_human_turn = self._first_move()
         while not self.check_game_over():
             if self.is_human_turn:
-                self.human_turn(input(f'Введите название города на букву "{self.current_city[-1].upper()}": '))
+                self.human_turn(input(f'Введите название города на букву "{self.current_city[-1].upper()}": ').lower())
             else:
                 self.computer_turn()
-                self.is_human_turn = True
             self.check_game_over()
 
     def human_turn(self, city_input: str):
@@ -145,7 +155,7 @@ class CityGame:
             print('Вы не ввели город!')
             return
         
-        if city_input == 'стоп':
+        if city_input.lower() == 'стоп':
             print('Вы вышли из игры!')
             self.winner = 'Компьютер победил!'
             return
@@ -155,8 +165,8 @@ class CityGame:
                 return
         
         if not self.current_city:
-            self.current_city = city_input
-            self.cities.use_city(city_input)
+            self.set_current_city(city_input)
+            self.is_human_turn = False
             return
 
         if city_input.lower()[0] != self.current_city[-1]:
@@ -167,12 +177,22 @@ class CityGame:
             print('Этот город уже был назван!')
             return
 
-        self.current_city = city_input
-        self.cities.use_city(city_input)
+        self.set_current_city(city_input)
         self.is_human_turn = False
 
     def computer_turn(self):
-        pass
+        """
+        Метод для хода компьютера.
+        """
+        if not self.current_city:
+            comp_city = random.choice(self.cities.get_all_cities())
+        else:
+            comp_city = random.choice(self.cities.get_unused_cities(self.current_city[-1]))
+        print(f'Компьютер назвал город {comp_city.title()}')
+        self.set_current_city(comp_city)
+        self.is_human_turn = True
+        return
+        
 
     def check_game_over(self) -> bool:
         pass
