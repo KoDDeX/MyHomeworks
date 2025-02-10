@@ -5,6 +5,24 @@ Homework 31
 """
 import os
 import json
+from dataclasses import dataclass, field
+
+DATA_FILE = 'data.json'
+
+
+@dataclass
+class City:
+    """
+    Датакласс для представления города.
+    """
+    name: str
+    population: str
+    subject: str
+    district: str
+    lat: float
+    lon: float
+    _is_used: bool = field(default=False)
+
 
 class JsonFile:
     """
@@ -43,32 +61,48 @@ class CitiesSerializer:
     Класс, использующий датакласс City для хранения информации о городах.
     """
     def __init__(self, city_data: list[dict]):
-        self.city_data = {City(
-            city_data['name'],
-            city_data['population'],
-            city_data['subject'],
-            city_data['district'],
-            city_data['coords']['lat'],
-            city_data['coords']['lon']
-        )}
+        self.cities = self._create_cities(city_data)
+    
+    def _create_cities(self, city_data: list[dict]) -> list[City]:
+        cities = []
+        for city_info in city_data:
+            city = City(
+                name=city_info['name'],
+                population=city_info['population'],
+                subject=city_info['subject'],
+                district=city_info['district'],
+                lat=city_info['coords']['lat'],
+                lon=city_info['coords']['lon']
+            )
+            cities.append(city)
+        return cities
     
     def get_all_cities(self) -> set:
-        return self.city_data
+        return self.cities
 
 
-class City:
+class CityGame:
     """
-    Датакласс для представления города.
+    Класс, управляющий логикой игры "Города".
     """
-    def __init__(self, name: str, population: int, subject: str, district: str, latitude: str, longitude: str):
-        self.name = name
-        self.population = population
-        self.subject = subject
-        self.district = district
-        self.latitude = latitude
-        self.longitude = longitude
-        self._is_used = False
+    def __init__(self, cities: CitiesSerializer):
+        self.cities = cities
+        self.used_cities = []
+    
+    def start_game(self):
+        pass
 
+    def human_turn(self, city_input: str):
+        pass
+
+    def computer_turn(self):
+        pass
+
+    def check_game_over(self):
+        pass
+
+    def save_game_state(self):
+        pass
 
 class GameManager:
     """
@@ -76,4 +110,11 @@ class GameManager:
     """
     def __init__(self, json_file: str):
         self.json_file = JsonFile(json_file)
-        self.cities_serializer = CitiesSerializer(self.json_file.read())
+        self.cities = CitiesSerializer(self.json_file.read())
+        self.city_game = CityGame(self.cities)
+
+
+if __name__ == '__main__':
+    game_manager = GameManager(DATA_FILE)
+    # cities = game_manager.cities_serializer.get_all_cities()
+    # print(cities)
