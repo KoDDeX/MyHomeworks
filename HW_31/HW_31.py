@@ -67,10 +67,16 @@ class CitiesSerializer:
     
     def _create_cities(self, city_data: list[dict]) -> list[City]:
         cities = []
-        game_state_info = {}
         for city_info in city_data:
             if city_info.get('cities'):
-                game_state_info[city_info['name']] = city_info['cities']
+                cities.append(
+                    {'game_state_info':{
+                        'current_city': city_info['current_city'],
+                        'is_human_turn': city_info['is_human_turn'],
+                        'human_first_turn': city_info['human_first_turn']
+                    }
+                }
+                )
             else:
                 city = City(
                     name=city_info['name'].lower(),
@@ -102,12 +108,15 @@ class CityGame:
     """
     Класс, управляющий логикой игры "Города".
     """
-    def __init__(self, cities: CitiesSerializer, game_state_data: dict = None):
+    def __init__(self, cities: CitiesSerializer):
+        self.game_state_data = {}
+        if isinstance(cities.cities[0],dict):
+            self.game_state_data = cities.pop(0)
         self.cities = cities
-        self.current_city = None
+        self.current_city = self.game_state_data.get('current_city', None)
         self.winner = None
-        self.is_human_turn = None
-        self.human_first_turn = None # True -- человек ходит первым, False - компьютер ходит первым. Для подведения итогов
+        self.is_human_turn = self.game_state_data.get('is_human_turn', None)
+        self.human_first_turn = self.game_state_data.get('human_first_turn', None) # True -- человек ходит первым, False - компьютер ходит первым. Для подведения итогов
     
     def _dice(self) -> int:
         return random.choice(range(1, 7))
@@ -118,7 +127,7 @@ class CityGame:
         """
         while True:
             print('Определим, кто будет ходить первым.')
-            self.human_turn(input('Нажмите Enter, чтобы бросить кубик...'))
+            self.human_turn(input('Нажмите Enter, чтобы бросить кубик...'), True)
             if self.winner:
                 break
             human_dice = self._dice()
@@ -128,12 +137,15 @@ class CityGame:
             if human_dice > computer_dice:
                 while not self.current_city:
                     self.human_turn(input('Вы ходите первым. Введите название города: ').lower())
+                    self.human_first_turn = True
                 return False
             elif human_dice == computer_dice:
                 print('Ничья!')
             else:
                 print('Компьютер ходит первым!')
-                return False
+                self.computer_turn()
+                self.human_first_turn = False
+                return True
 
     def set_current_city(self, city_name: str) -> None:
         """
@@ -158,6 +170,8 @@ class CityGame:
         Метод для хода игрока.
         """
         if city_input.lower() == 'стоп':
+            if input('Хотите сохранить игру? (y/n): ').lower() == 'y':
+                self.save_game_state()
             print('Вы вышли из игры!')
             self.winner = 'Компьютер победил!'
             return
@@ -219,24 +233,37 @@ class CityGame:
 
     def save_game_state(self):
         """
-        Метод для сохранения состояния игры.
+        Метод для сохранения состояния игры и выхода.
         """
-        with open('game_state.json', 'w') as file:
-            json.dump({
-                'current_city': self.current_city,
-                'is_human_turn': self.is_human_turn,
-                'human_first_turn': self.human_first_turn,
-                'winner': self.winner
-            }, file)
+        self.game_state_data = [{
+            'current_city': self.current_city,
+            'is_human_turn': self.is_human_turn,
+            'human_first_turn': self.human_first_turn
+        }]
+        for city in self.cities.cities:
+            self.game_state_data.append(
+                {
+                    'name': city.name,
+                    'population': city.population,
+                    'subject': city.subject,
+                    'district': city.district,
+                    'coords': {
+                        'lat': city.lat,
+                        'lon': city.lon
+                    }
+                }
+            )
+        self.json_file = JsonFile(GAME_STATE)
+        self.json_file.write(self.game_state_data)
+        exit()
 
 class GameManager:
     """
     Фасад, который инкапсулирует взаимодействие между компонентами.
     """
     def __init__(self, json_file: str, game_state_file: str = GAME_STATE):
-        if os.path.exists(game_state_file):
-            if input('Хотите продолжить игру? (y/n): ').lower() == 'y':
-                self.json_file = JsonFile(game_state_file)
+        if os.path.exists(game_state_file) and input('Хотите продолжить игру? (y/n): ').lower() == 'y':
+            self.json_file = JsonFile(game_state_file)
         else:
             self.json_file = JsonFile(json_file)
         self.cities = CitiesSerializer(self.json_file.read())
