@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 import random
 
 DATA_FILE = 'data.json'
+GAME_STATE = 'game_state.json'
 BAD_LETTERS = ('ь', 'ъ', 'ы')
 
 @dataclass
@@ -66,16 +67,20 @@ class CitiesSerializer:
     
     def _create_cities(self, city_data: list[dict]) -> list[City]:
         cities = []
+        game_state_info = {}
         for city_info in city_data:
-            city = City(
-                name=city_info['name'].lower(),
-                population=city_info['population'],
-                subject=city_info['subject'],
-                district=city_info['district'],
-                lat=city_info['coords']['lat'],
-                lon=city_info['coords']['lon']
-            )
-            cities.append(city)
+            if city_info.get('cities'):
+                game_state_info[city_info['name']] = city_info['cities']
+            else:
+                city = City(
+                    name=city_info['name'].lower(),
+                    population=city_info['population'],
+                    subject=city_info['subject'],
+                    district=city_info['district'],
+                    lat=city_info['coords']['lat'],
+                    lon=city_info['coords']['lon']
+                )
+                cities.append(city)
         return cities
     
     def get_all_cities(self) -> set:
@@ -97,12 +102,12 @@ class CityGame:
     """
     Класс, управляющий логикой игры "Города".
     """
-    def __init__(self, cities: CitiesSerializer):
+    def __init__(self, cities: CitiesSerializer, game_state_data: dict = None):
         self.cities = cities
         self.current_city = None
-        self.used_cities = []
         self.winner = None
         self.is_human_turn = None
+        self.human_first_turn = None # True -- человек ходит первым, False - компьютер ходит первым. Для подведения итогов
     
     def _dice(self) -> int:
         return random.choice(range(1, 7))
@@ -112,8 +117,10 @@ class CityGame:
         Метод для определения первого хода игрока.
         """
         while True:
-            print('Определим, кто будет ходить первым. Бросаем кубик...')
-            input('Нажмите Enter, чтобы бросить кубик...')
+            print('Определим, кто будет ходить первым.')
+            self.human_turn(input('Нажмите Enter, чтобы бросить кубик...'))
+            if self.winner:
+                break
             human_dice = self._dice()
             print(f'У вас выпало {human_dice}\nТеперь бросает компьютер...')
             computer_dice = self._dice()
@@ -121,7 +128,7 @@ class CityGame:
             if human_dice > computer_dice:
                 while not self.current_city:
                     self.human_turn(input('Вы ходите первым. Введите название города: ').lower())
-                return True
+                return False
             elif human_dice == computer_dice:
                 print('Ничья!')
             else:
@@ -138,26 +145,28 @@ class CityGame:
             self.current_city = self.current_city[:-1]
 
     def start_game(self):
-        print('Добро пожаловать в игру "Города"!')
+        print('Добро пожаловать в игру "Города"!\nВ любой момент вы можете ввести "стоп", чтобы выйти из игры.\n')
         self.is_human_turn = self._first_move()
         while not self.check_game_over():
             if self.is_human_turn:
                 self.human_turn(input(f'Введите название города на букву "{self.current_city[-1].upper()}": ').lower())
             else:
                 self.computer_turn()
-            self.check_game_over()
 
-    def human_turn(self, city_input: str):
+    def human_turn(self, city_input: str, first_move: bool = False) -> None:
         """
         Метод для хода игрока.
         """
-        if not city_input:
-            print('Вы не ввели город!')
-            return
-        
         if city_input.lower() == 'стоп':
             print('Вы вышли из игры!')
             self.winner = 'Компьютер победил!'
+            return
+
+        if first_move:
+            return
+
+        if not city_input:
+            print('Вы не ввели город!')
             return
         
         if city_input.lower() not in self.cities.get_all_cities():
@@ -173,7 +182,7 @@ class CityGame:
             print('Вы неправильно назвали город!')
             return
 
-        if city_input in self.used_cities:
+        if city_input in self.cities.get_used_cities():
             print('Этот город уже был назван!')
             return
 
@@ -195,17 +204,41 @@ class CityGame:
         
 
     def check_game_over(self) -> bool:
-        pass
+        if self.winner:
+            print(self.winner)
+            return True
+        if not self.cities.get_unused_cities(self.current_city[-1]):
+            if self.is_human_turn and self.human_first_turn:
+                print('Ничья!\nСписок городов закончился!')
+            elif self.is_human_turn and not self.human_first_turn:
+                print('Компьютер победил!')
+            else:
+                print('Вы победили!')
+            return True
+        return False
 
     def save_game_state(self):
-        pass
+        """
+        Метод для сохранения состояния игры.
+        """
+        with open('game_state.json', 'w') as file:
+            json.dump({
+                'current_city': self.current_city,
+                'is_human_turn': self.is_human_turn,
+                'human_first_turn': self.human_first_turn,
+                'winner': self.winner
+            }, file)
 
 class GameManager:
     """
     Фасад, который инкапсулирует взаимодействие между компонентами.
     """
-    def __init__(self, json_file: str):
-        self.json_file = JsonFile(json_file)
+    def __init__(self, json_file: str, game_state_file: str = GAME_STATE):
+        if os.path.exists(game_state_file):
+            if input('Хотите продолжить игру? (y/n): ').lower() == 'y':
+                self.json_file = JsonFile(game_state_file)
+        else:
+            self.json_file = JsonFile(json_file)
         self.cities = CitiesSerializer(self.json_file.read())
         self.city_game = CityGame(self.cities)
 
