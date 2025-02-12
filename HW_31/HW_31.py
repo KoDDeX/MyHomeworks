@@ -12,6 +12,7 @@ DATA_FILE = 'data.json'
 GAME_STATE = 'game_state.json'
 BAD_LETTERS = ('ь', 'ъ', 'ы')
 
+
 @dataclass
 class City:
     """
@@ -49,7 +50,7 @@ class JsonFile:
         with open(self.file_path, 'w', encoding=encoding) as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         """
         Метод проверки существования файла
         """
@@ -65,7 +66,10 @@ class CitiesSerializer:
     def __init__(self, city_data: list[dict]):
         self.cities = self._create_cities(city_data)
     
-    def _create_cities(self, city_data: list[dict]) -> list[City]:
+    def _create_cities(self, city_data: list[dict]) -> list[City] | list[dict,City]:
+        """
+        Метод инициализирующий список городов для игры. Так же загружает информацию для восстановления сохраненной игры
+        """
         cities = []
         for city_info in city_data:
             if 'current_city' in city_info:
@@ -88,20 +92,33 @@ class CitiesSerializer:
                 cities.append(city)
         return cities
     
-    def get_all_cities(self) -> set:
+    def get_all_cities(self) -> list:
+        """
+        Метод для получения полного списка городов
+        """
         return [city.name for city in self.cities]
     
-    def get_used_cities(self) -> set:
+    def get_used_cities(self) -> list:
+        """
+        Метод для получения списка уже названных городов
+        """    
         return [city.name for city in self.cities if city._is_used]
     
-    def get_unused_cities(self, first_char: str) -> set:
+    def get_unused_cities(self, first_char: str) -> list:
+        """
+        Метод для получения списка городов, начинающихся на заданную букву и не использованных ранее - лайфхак для компа
+        """
         return [city.name for city in self.cities if not city._is_used and city.name[0] == first_char]
-    
+
     def use_city(self, city_name: str) -> None:
+        """
+        Метод для отметки города как использованного
+        """
         for city in self.cities:
             if city.name == city_name:
                 city._is_used = True
                 break
+
 
 class CityGame:
     """
@@ -118,11 +135,14 @@ class CityGame:
         self.human_first_turn = self.game_state_data.get('human_first_turn', None) # True -- человек ходит первым, False - компьютер ходит первым. Для подведения итогов
     
     def _dice(self) -> int:
+        """
+        Метод имитирует бросок кубика.
+        """
         return random.choice(range(1, 7))
 
     def _first_move(self) -> bool:
         """
-        Метод для определения первого хода игрока.
+        Метод для определения первого хода.
         """
         while True:
             print('Определим, кто будет ходить первым.')
@@ -156,25 +176,24 @@ class CityGame:
             self.current_city = self.current_city[:-1]
 
     def start_game(self):
+        """
+        Метод запускающий игру.
+        """
         if not self.game_state_data:
             print('Добро пожаловать в игру "Города"!\nВ любой момент вы можете ввести "стоп", чтобы выйти из игры.\n')
             self.is_human_turn = self._first_move()
         else:
             print(f'Продолжаем игру...\nПоследний названный город: {self.current_city.capitalize()}')
-        while not self.check_game_over():
-            if self.is_human_turn:
-                self.human_turn(input(f'Введите название города на букву "{self.current_city[-1].upper()}": ').lower())
-            else:
-                self.computer_turn()
 
     def human_turn(self, city_input: str, first_move: bool = False) -> None:
         """
-        Метод для хода игрока.
+        Метод отработки хода игрока.
         """
         if city_input.lower() == 'стоп':
-            if input('Хотите сохранить игру? (y/n): ').lower() == 'y':
+            if input('Хотите сохранить игру? (y/n): ').lower() in ['y', 'н']:
                 self.save_game_state()
-            print('Вы вышли из игры!')
+                self.winner = 'Выход'
+                return
             self.winner = 'Компьютер победил!'
             return
 
@@ -207,7 +226,7 @@ class CityGame:
 
     def computer_turn(self):
         """
-        Метод для хода компьютера.
+        Метод отработки хода компьютера.
         """
         if not self.current_city:
             comp_city = random.choice(self.cities.get_all_cities())
@@ -220,16 +239,21 @@ class CityGame:
         
 
     def check_game_over(self) -> bool:
+        """
+        Метод порверки состояния игры.
+        """
         if self.winner:
-            print(self.winner)
+            if self.winner == 'Выход':
+                self.winner = ''
+                return True
             return True
         if not self.cities.get_unused_cities(self.current_city[-1]):
             if self.is_human_turn and self.human_first_turn:
-                print('Ничья!\nСписок городов закончился!')
+                self.winner = 'Ничья! Закончился список городов.'
             elif self.is_human_turn and not self.human_first_turn:
-                print('Компьютер победил!')
+                self.winner = 'Компьютер победил!'
             else:
-                print('Вы победили!')
+                self.winner = 'Вы победили!'
             return True
         return False
 
@@ -258,23 +282,44 @@ class CityGame:
             )
         self.json_file = JsonFile(GAME_STATE)
         self.json_file.write(self.game_state_data)
-        exit()
+        print('Игра сохранена!')
+        
+
 
 class GameManager:
     """
     Фасад, который инкапсулирует взаимодействие между компонентами.
     """
     def __init__(self, json_file: str, game_state_file: str = GAME_STATE):
-        if os.path.exists(game_state_file) and input('Хотите продолжить игру? (y/n): ').lower() == 'y':
+        if os.path.exists(game_state_file) and input('Хотите продолжить игру? (y/n): ').lower() in ['y', 'н']:
             self.json_file = JsonFile(game_state_file)
         else:
             self.json_file = JsonFile(json_file)
         self.cities = CitiesSerializer(self.json_file.read())
         self.city_game = CityGame(self.cities)
+    
+    def __call__(self):
+        self.city_game.start_game()
+        self.run_game()
+    
+    def run_game(self):
+        """
+        Метод координирующий выполнение игры.
+        """
+        while not self.city_game.check_game_over():
+            if self.city_game.is_human_turn:
+                self.city_game.human_turn(input(f'Введите название города на букву "{self.city_game.current_city[-1].upper()}": ').lower())
+            else:
+                self.city_game.computer_turn()
+        self.display_game_result()
+    
+    def display_game_result(self):
+        """
+        Метод отображения результата игры.
+        """
+        print(f'Игра завершена!\n{f'Победитель: {self.city_game.winner}' if self.city_game.winner else ''}\nВ игре были использованы следующие города:\n{self.cities.get_used_cities()}')
 
 
 if __name__ == '__main__':
     game_manager = GameManager(DATA_FILE)
-    game_manager.city_game.start_game()
-    # cities = game_manager.cities_serializer.get_all_cities()
-    # print(cities)
+    game_manager()
