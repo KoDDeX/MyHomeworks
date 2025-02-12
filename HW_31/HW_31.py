@@ -68,14 +68,12 @@ class CitiesSerializer:
     def _create_cities(self, city_data: list[dict]) -> list[City]:
         cities = []
         for city_info in city_data:
-            if city_info.get('cities'):
+            if 'current_city' in city_info:
                 cities.append(
-                    {'game_state_info':{
-                        'current_city': city_info['current_city'],
+                    {'current_city': city_info['current_city'],
                         'is_human_turn': city_info['is_human_turn'],
                         'human_first_turn': city_info['human_first_turn']
                     }
-                }
                 )
             else:
                 city = City(
@@ -84,7 +82,8 @@ class CitiesSerializer:
                     subject=city_info['subject'],
                     district=city_info['district'],
                     lat=city_info['coords']['lat'],
-                    lon=city_info['coords']['lon']
+                    lon=city_info['coords']['lon'],
+                    _is_used=city_info['is_used'] if 'is_used' in city_info else False
                 )
                 cities.append(city)
         return cities
@@ -110,8 +109,8 @@ class CityGame:
     """
     def __init__(self, cities: CitiesSerializer):
         self.game_state_data = {}
-        if isinstance(cities.cities[0],dict):
-            self.game_state_data = cities.pop(0)
+        if isinstance(cities.cities[0], dict):
+            self.game_state_data = cities.cities.pop(0)
         self.cities = cities
         self.current_city = self.game_state_data.get('current_city', None)
         self.winner = None
@@ -157,8 +156,11 @@ class CityGame:
             self.current_city = self.current_city[:-1]
 
     def start_game(self):
-        print('Добро пожаловать в игру "Города"!\nВ любой момент вы можете ввести "стоп", чтобы выйти из игры.\n')
-        self.is_human_turn = self._first_move()
+        if not self.game_state_data:
+            print('Добро пожаловать в игру "Города"!\nВ любой момент вы можете ввести "стоп", чтобы выйти из игры.\n')
+            self.is_human_turn = self._first_move()
+        else:
+            print(f'Продолжаем игру...\nПоследний названный город: {self.current_city.capitalize()}')
         while not self.check_game_over():
             if self.is_human_turn:
                 self.human_turn(input(f'Введите название города на букву "{self.current_city[-1].upper()}": ').lower())
@@ -250,7 +252,8 @@ class CityGame:
                     'coords': {
                         'lat': city.lat,
                         'lon': city.lon
-                    }
+                    },
+                    'is_used': city._is_used
                 }
             )
         self.json_file = JsonFile(GAME_STATE)
