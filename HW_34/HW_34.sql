@@ -11,11 +11,12 @@
 
 CREATE TABLE IF NOT EXISTS ServiceRecord (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
+    name TEXT NOT NULL,
     phone TEXT,
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     master_id INTEGER,
-    status TEXT
+    status TEXT,
+    FOREIGN KEY (master_id) REFERENCES Masters(id) ON DELETE SET NULL
 );
 
 -- Таблица «Мастера»:
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS ServiceRecord (
 
 CREATE TABLE IF NOT EXISTS Masters (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    first_name TEXT,
+    first_name TEXT NOT NULL,
     last_name TEXT,
     middle_name TEXT,
     phone TEXT
@@ -41,9 +42,9 @@ CREATE TABLE IF NOT EXISTS Masters (
 
 CREATE TABLE IF NOT EXISTS Services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT UNIQUE,
-    description TEXT,
-    price REAL
+    title TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    price REAL NOT NULL
 );
 
 -- Таблица для связи мастеров и услуг (masters_services):
@@ -69,3 +70,6 @@ CREATE TABLE IF NOT EXISTS AppointmentsServices (
     FOREIGN KEY (service_id) REFERENCES Services(id) ON DELETE CASCADE,
     PRIMARY KEY (appointment_id, service_id)
 );
+
+-- Включение проверки целостности базы данных и поддержки внешних ключей
+PRAGMA foreign_keys = ON
